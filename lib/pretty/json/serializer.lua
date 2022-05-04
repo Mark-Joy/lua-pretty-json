@@ -29,8 +29,25 @@ local function escape_str(s)
     return s
 end
 
+local function sorted_pairs(obj)
+    local sorted_keys = {}
+
+    for key in pairs(obj) do
+        table.insert(sorted_keys, key)
+    end
+
+    table.sort(sorted_keys)
+
+    return coroutine.wrap(function()
+        for _, key in ipairs(sorted_keys) do
+            coroutine.yield(key, obj[key])
+        end
+    end)
+end
+
 local Serializer = {
     print_address = false,
+    sort_table_keys = false,
     max_depth = 100000
 }
 
@@ -40,6 +57,7 @@ setmetatable(Serializer, {
             depth = 0,
             max_depth = opts.max_depth,
             print_address = opts.print_address,
+            sort_table_keys = opts.sort_table_keys,
             stream = opts.stream
         }
 
@@ -102,10 +120,11 @@ end
 
 function Serializer:table(obj, replacer, indent, space)
     local stream = self.stream
+    local iter = self.sort_table_keys and sorted_pairs or pairs
 
     stream:write("{")
     local len = 0
-    for k, v in pairs(obj) do
+    for k, v in iter(obj) do
         if replacer then v = replacer(k, v) end
 
         if v ~= nil then

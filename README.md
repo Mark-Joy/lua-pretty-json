@@ -37,11 +37,12 @@ json.parse(str)
 
 ## API
 
-* json.stringify(obj, replacer, space, print_address)
+* json.stringify(obj, replacer, space, print_address, sort_table_keys)
   * ``obj`` ``<any>`` 需要序列化的值
   * ``replacer`` ``<function>`` 同 [js JSON.stringify](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
   * ``space`` ``<number>`` 空格数
   * ``print_address`` ``<boolean>`` 输出内存地址
+  * ``sort_table_keys`` ``<boolean>``
 * json.parse(str, without_null)
   * ``str`` ``<string>`` 需要反序列化的值
   * ``without_null`` ``<boolean>`` 是否输出 null 值，默认使用 ``json.null``
