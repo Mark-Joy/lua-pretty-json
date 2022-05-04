@@ -31,19 +31,18 @@ end
 
 local function sorted_pairs(obj)
     local sorted_keys = {}
+
     for key in pairs(obj) do
         table.insert(sorted_keys, key)
     end
 
     table.sort(sorted_keys)
 
-    local i = 0
-    return function()
-        if i < #sorted_keys then
-            i = i + 1
-            return sorted_keys[i], obj[sorted_keys[i]]
+    return coroutine.wrap(function()
+        for _, key in ipairs(sorted_keys) do
+            coroutine.yield(key, obj[key])
         end
-    end
+    end)
 end
 
 local Serializer = {
