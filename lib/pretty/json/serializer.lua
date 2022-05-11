@@ -48,6 +48,7 @@ end
 local Serializer = {
     print_address = false,
     sort_table_keys = false,
+    escape_string_values = true,
     max_depth = 100000
 }
 
@@ -58,6 +59,7 @@ setmetatable(Serializer, {
             max_depth = opts.max_depth,
             print_address = opts.print_address,
             sort_table_keys = opts.sort_table_keys,
+            escape_string_values = opts.escape_string_values,
             stream = opts.stream
         }
 
@@ -158,7 +160,11 @@ function Serializer:json(obj, replacer, indent, space)
     elseif kind == "table" then
         self:table(obj, replacer, indent, space)
     elseif kind == "string" then
-        stream:write("\"", escape_str(obj), "\"")
+        if self.escape_string_values then
+            stream:write("\"", escape_str(obj), "\"")
+        else
+            stream:write("\"", obj, "\"")
+        end
     elseif kind == "number" then
         stream:write(tostring(obj))
     elseif kind == "boolean" then
