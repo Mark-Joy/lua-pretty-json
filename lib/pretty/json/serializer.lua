@@ -5,32 +5,19 @@ local Constant = require "pretty.json.constant"
 local NULL = Constant.NULL
 local ESC_MAP = Constant.ESC_MAP
 
-local function kind_of(obj, empty_tables_are_arrays)
+local function kind_of(obj, empty_table_as_array)
     if type(obj) ~= "table" then return type(obj) end
     if obj == NULL then return "nil" end
 
-    if empty_tables_are_arrays then
-        local count = 0
-        for _ in pairs(obj) do
-            count = count + 1
-        end
+    local i = 1
+    for _ in pairs(obj) do
+        if obj[i] ~= nil then i = i + 1 else return "table" end
+    end
 
-        if count == #obj then
-            return "array"
-        else
-            return "table"
-        end
+    if i == 1 and not empty_table_as_array then
+        return "table"
     else
-        local i = 1
-        for _ in pairs(obj) do
-            if obj[i] ~= nil then i = i + 1 else return "table" end
-        end
-
-        if i == 1 then
-            return "table"
-        else
-            return "array"
-        end
+        return "array"
     end
 end
 
@@ -62,6 +49,7 @@ local Serializer = {
     print_address = false,
     sort_table_keys = false,
     escape_string_values = true,
+    empty_table_as_array = false,
     max_depth = 100000
 }
 
@@ -73,7 +61,7 @@ setmetatable(Serializer, {
             print_address = opts.print_address,
             sort_table_keys = opts.sort_table_keys,
             escape_string_values = opts.escape_string_values,
-            empty_tables_are_arrays = opts.empty_tables_are_arrays,
+            empty_table_as_array = opts.empty_table_as_array,
             stream = opts.stream
         }
 
@@ -164,7 +152,7 @@ end
 
 function Serializer:json(obj, replacer, indent, space)
     local stream = self.stream
-    local kind = kind_of(obj, self.empty_tables_are_arrays)
+    local kind = kind_of(obj, self.empty_table_as_array)
 
     self.depth = self.depth + 1
     if self.depth > self.max_depth then error("Reach max depth: " .. tostring(self.max_depth)) end
