@@ -9,13 +9,14 @@ local json = {
     null = Constant.NULL
 }
 
-function json.stringify(obj, replacer, space, print_address, sort_table_keys, escape_string_values)
+function json.stringify(obj, replacer, space, print_address, sort_table_keys, escape_string_values, empty_tables_are_arrays)
     if type(space) ~= "number" then space = 0 end
 
     return Serializer({
         print_address = print_address,
         sort_table_keys = sort_table_keys,
         escape_string_values = escape_string_values,
+        empty_tables_are_arrays = empty_tables_are_arrays,
         stream = {
             fragments = {},
             write = function(self, ...)

@@ -5,19 +5,32 @@ local Constant = require "pretty.json.constant"
 local NULL = Constant.NULL
 local ESC_MAP = Constant.ESC_MAP
 
-local function kind_of(obj)
+local function kind_of(obj, empty_tables_are_arrays)
     if type(obj) ~= "table" then return type(obj) end
     if obj == NULL then return "nil" end
 
-    local i = 1
-    for _ in pairs(obj) do
-        if obj[i] ~= nil then i = i + 1 else return "table" end
-    end
+    if empty_tables_are_arrays then
+        local count = 0
+        for _ in pairs(obj) do
+            count = count + 1
+        end
 
-    if i == 1 then
-        return "table"
+        if count == #obj then
+            return "array"
+        else
+            return "table"
+        end
     else
-        return "array"
+        local i = 1
+        for _ in pairs(obj) do
+            if obj[i] ~= nil then i = i + 1 else return "table" end
+        end
+
+        if i == 1 then
+            return "table"
+        else
+            return "array"
+        end
     end
 end
 
@@ -60,6 +73,7 @@ setmetatable(Serializer, {
             print_address = opts.print_address,
             sort_table_keys = opts.sort_table_keys,
             escape_string_values = opts.escape_string_values,
+            empty_tables_are_arrays = opts.empty_tables_are_arrays,
             stream = opts.stream
         }
 
@@ -150,7 +164,7 @@ end
 
 function Serializer:json(obj, replacer, indent, space)
     local stream = self.stream
-    local kind = kind_of(obj)
+    local kind = kind_of(obj, self.empty_tables_are_arrays)
 
     self.depth = self.depth + 1
     if self.depth > self.max_depth then error("Reach max depth: " .. tostring(self.max_depth)) end
