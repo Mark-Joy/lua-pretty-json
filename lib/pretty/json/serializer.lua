@@ -50,7 +50,7 @@ local Serializer = {
     sort_table_keys = false,
     escape_string_values = true,
     empty_table_as_array = false,
-    max_depth = 100000
+    max_depth = 1000000
 }
 
 setmetatable(Serializer, {
