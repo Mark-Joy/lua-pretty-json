@@ -22,11 +22,7 @@ local function kind_of(obj, empty_table_as_array)
 end
 
 local function escape_str(s)
-    for k, v in pairs(ESC_MAP) do
-        s = s:gsub(k, v)
-    end
-
-    return s
+    return s:gsub('[\\"\a\b\f\n\r\t\v]', ESC_MAP)
 end
 
 local function sorted_pairs(obj)
