@@ -85,7 +85,11 @@ function Serializer:key(key)
     elseif kind == "table" then
         error("Can't encode table as key.")
     elseif kind == "string" then
-        stream:write("\"", escape_str(key), "\"")
+        if self.escape_string_values then
+            stream:write("\"", escape_str(key), "\"")
+        else
+            stream:write("\"", key, "\"")
+        end
     elseif kind == "number" then
         stream:write("\"", tostring(key), "\"")
     elseif self.print_address then
